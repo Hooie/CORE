@@ -52,6 +52,8 @@ private:
 
 	FVector ConfirmedAimDirection = FVector::ForwardVector;
 
+	FTimerHandle TargetingDelayHandle;
+
 	UFUNCTION()
 	void OnConfirmed();
 

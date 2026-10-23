@@ -44,12 +44,13 @@ void UGA_Murdock_JudgementBlast::ActivateAbility(const FGameplayAbilitySpecHandl
 		PlayTargetingMontage->ReadyForActivation();
 	}
 
-	FTimerHandle TargetingDelayHandle;
 	GetWorld()->GetTimerManager().SetTimer(TargetingDelayHandle, this, &UGA_Murdock_JudgementBlast::StartShootingPhase, ShootingReadyDelay, false);
 }
 
 void UGA_Murdock_JudgementBlast::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	GetWorld()->GetTimerManager().ClearTimer(TargetingDelayHandle);
+
 	StopLaserSight();
 
 	if ( ACPlayerCharacter* CPlayerCharacter = Cast<ACPlayerCharacter>(GetOwningAvatarCharacter()) )
@@ -92,6 +93,7 @@ void UGA_Murdock_JudgementBlast::OnConfirmed()
 	if ( K2_HasAuthority() || IsLocallyControlled() )
 	{
 		UAbilityTask_PlayMontageAndWait* PlayShootMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, ShootMontage);
+		PlayShootMontage->OnBlendOut.AddDynamic(this, &UGA_Murdock_JudgementBlast::K2_EndAbility);
 		PlayShootMontage->OnCompleted.AddDynamic(this, &UGA_Murdock_JudgementBlast::K2_EndAbility);
 		PlayShootMontage->OnCancelled.AddDynamic(this, &UGA_Murdock_JudgementBlast::K2_EndAbility);
 		PlayShootMontage->OnInterrupted.AddDynamic(this, &UGA_Murdock_JudgementBlast::K2_EndAbility);
@@ -266,6 +268,9 @@ void UGA_Murdock_JudgementBlast::StopLaserSight()
 
 void UGA_Murdock_JudgementBlast::StartShootingPhase()
 {
+	if ( !IsActive() )
+		return;
+
 	UAbilityTask_WaitConfirmCancel* WaitConfirmCancel = UAbilityTask_WaitConfirmCancel::WaitConfirmCancel(this);
 	WaitConfirmCancel->OnConfirm.AddDynamic(this, &UGA_Murdock_JudgementBlast::OnConfirmed);
 	WaitConfirmCancel->OnCancel.AddDynamic(this, &UGA_Murdock_JudgementBlast::K2_EndAbility);
