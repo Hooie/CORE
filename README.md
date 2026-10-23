@@ -7,4 +7,4 @@ CORE
 <img width="1671" height="941" alt="GameStartPopup" src="https://github.com/user-attachments/assets/34798e5f-de70-4b02-a4cf-d6ba773b744f" />
 
 <br><br>
-[![시연 영상 보러 가기](https://youtu.be/BaNoOXyXmHQ)](https://youtu.be)
+[![시연 영상 보러 가기](https://youtube.com)](https://youtu.be/BaNoOXyXmHQ)
